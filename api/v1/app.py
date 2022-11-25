@@ -16,7 +16,7 @@ CORS(app, resources={r"/*": {"origins": "0.0.0.0"}})
 
 
 @app.teardown_appcontext
-def tear_down(exception):
+def tear_down(error):
     """
     after each request, this method calls .close() (i.e. .remove()) on
     the current SQLAlchemy Session
@@ -25,15 +25,11 @@ def tear_down(exception):
 
 
 @app.errorhandler(404)
-def handle_404(exception):
+def handle_404(error):
     """
-    handles 404 errors, in the event that global error handler fails
+    Custom 404 error
     """
-    code = exception.__str__().split()[0]
-    description = exception.description
-    message = {'error': description}
-    return make_response(jsonify(message), code)
-
+    return jsonify({'error': 'Not found'}), 404
 
 if __name__ == '__main__':
     app.run(host=getenv('HBNB_API_HOST'),
